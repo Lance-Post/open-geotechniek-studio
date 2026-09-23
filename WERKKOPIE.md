@@ -34,3 +34,16 @@ git merge upstream/main
 ```
 
 GitHub Actions staat uit in deze kopie, zodat de publicatie- en releaseworkflows van OpenAEC hier niet draaien.
+
+## Online versie
+
+De browserversie van deze werkkopie staat op:
+
+**https://lance-post.github.io/open-geotechniek-studio/**
+
+Elke push naar `versie-2026-09-22` die `apps/desktop/**` raakt, publiceert automatisch een nieuwe versie
+(workflow `.github/workflows/pages.yml`, circa 2 minuten). Handmatig starten kan via het tabblad Actions.
+
+In de browser ontbreken de onderdelen die het Rust-deel nodig hebben: PDF-rapporten, IFC-export en het openen
+van projectbestanden (.ifcgis). Gebruik daarvoor de desktopversie. De experimentele berekeningen zijn in deze
+interne versie wél zichtbaar; op de publieke site van OpenAEC staan die uit.
