@@ -1,0 +1,59 @@
+name: Publiceer online versie (GitHub Pages)
+
+# Bouwt de browserversie van Open Geotechniek Studio uit deze werkkopie en
+# publiceert die op GitHub Pages. Draait bij elke push naar de werkbranch en
+# kan handmatig gestart worden via "Run workflow".
+#
+# VITE_PUBLIC_WEB wordt bewust NIET gezet: ook de experimentele berekeningen
+# (o.a. paaldraagvermogen, kalendering) zijn in deze interne versie zichtbaar.
+
+on:
+  push:
+    branches:
+      - versie-2026-09-22
+    paths:
+      - "apps/desktop/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/desktop/package-lock.json
+      - name: Pakketten installeren
+        run: npm ci
+        working-directory: apps/desktop
+      - name: Bouwen
+        run: npm run build -- --base=/open-geotechniek-studio/
+        working-directory: apps/desktop
+      - name: Fallback voor onbekende paden
+        run: cp dist/index.html dist/404.html
+        working-directory: apps/desktop
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/desktop/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
